@@ -1,12 +1,13 @@
+import os
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 from lib.pages.basepage import BasePage
 from lib.pages.homepage import HomePage
+from lib.constants import Constants
 
 
 def before_all(context):
     driver = set_selenium_driver(context)
-    driver.set_page_load_timeout('0.5')
+    driver.set_page_load_timeout(Constants.SHORT_WAIT)
     driver.maximize_window()
 
     context.web_driver = driver
@@ -58,12 +59,17 @@ def set_selenium_driver(context):
 
 
 def set_local_driver() -> webdriver:
+    chromedriver_path = "chromedriver/chromedriver-win64/chromedriver.exe"
+
+    if not os.path.exists(chromedriver_path):
+        raise FileNotFoundError(f"Chromedriver not found: {chromedriver_path}")
+
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--window-size=1920x1080")
     chrome_options.add_argument("--lang=en-US")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
     chrome_options.add_experimental_option('useAutomationExtension', False)
-    return webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+    return webdriver.Chrome(executable_path=chromedriver_path, options=chrome_options)
 
 
 def set_docker_driver() -> webdriver:
@@ -78,6 +84,7 @@ def set_docker_driver() -> webdriver:
         command_executor='http://0.0.0.0:4444/wd/hub',
         desired_capabilities=chrome_options.to_capabilities()
     )
+
 
 def test_rail_report(context):
     return context.config.userdata["testrail"]

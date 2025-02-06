@@ -29,7 +29,7 @@ Upgrading your `pip` by running:
 
 To execute this project, you must first install the requirements file with the next command:
 
-`python3 -m pip install requirements.txt`
+`python3 -m pip install requirements.txt` or `python -m pip install -r requirements.txt`
 
 Then of install all requirements you can execute the automated tests with the next command:
 
