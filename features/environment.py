@@ -50,7 +50,7 @@ def validate_scenario(scenario, context, steps):
 
 
 def set_selenium_driver(context):
-    env = context.config.userdata["driver"]
+    env = context.config.userdata.get("driver", "local")
     if env == 'aws':
         driver = set_docker_driver()
     else:
@@ -76,15 +76,16 @@ def set_local_driver() -> webdriver:
 
 
 def set_docker_driver() -> webdriver:
+    selenium_url = os.environ.get("SELENIUM_URL", "http://0.0.0.0:4444/wd/hub")
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
-    chrome_options.set_capability('--lang', 'en-GB')
+    chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--headless")
     chrome_options.add_experimental_option('useAutomationExtension', False)
 
     return webdriver.Remote(
-        command_executor='http://0.0.0.0:4444/wd/hub',
+        command_executor=selenium_url,
         desired_capabilities=chrome_options.to_capabilities()
     )
 
